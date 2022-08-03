@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Button,
   SafeAreaView,
@@ -10,7 +10,7 @@ import {
 import {RootScreenPramList} from '../../navigation/StackNavigation';
 import request from '../../service/request';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
-
+import EncryptedStorage from 'react-native-encrypted-storage';
 type props = NativeStackScreenProps<RootScreenPramList, 'Login'>;
 
 const useInput = (initailState: string) => {
@@ -25,24 +25,48 @@ const style = StyleSheet.create({
   container: {flex: 1},
   formContainer: {flex: 1, justifyContent: 'center'},
   formInput: {borderColor: 'black', borderWidth: 1, marginBottom: 2},
+  text: {textAlign: 'center'},
 });
 
 const Login = ({navigation}: props) => {
   const name = useInput('');
   const password = useInput('');
   const email = useInput('');
+  const [text, setText] = useState<string>('');
   const onSubmit = () => {
     request
-      .post('/api/auth/login', {
-        username: name.value,
+      .post('/api/login', {
+        name: name.value,
         email: email.value,
         password: password.value,
       })
-      .then(res => {
-        navigation.push('Test');
-      })
       .catch(err => console.log(err));
   };
+
+  const set = async () => {
+    console.log(
+      'accessToken : ',
+      await EncryptedStorage.getItem('accessToken'),
+    );
+    console.log(
+      'refreshToken : ',
+      await EncryptedStorage.getItem('refreshToken'),
+    );
+    console.log('accessToken : ', await EncryptedStorage.getItem('tokenType'));
+
+    setText((await EncryptedStorage.getItem('accessToken')) || '');
+  };
+
+  useEffect(() => {
+    /*   EncryptedStorage.removeItem('accessToken');
+    EncryptedStorage.removeItem('refreshToken');
+    EncryptedStorage.removeItem('tokenType'); */
+    if (!text) {
+      set();
+    } else {
+      navigation.navigate('Test');
+    }
+  }, [navigation, text]);
 
   return (
     <SafeAreaView style={style.container}>
@@ -53,7 +77,7 @@ const Login = ({navigation}: props) => {
         <Button title="submit" onPress={onSubmit} />
       </View>
       <View style={style.formContainer}>
-        <Text style={{textAlign: 'center'}}>{''}</Text>
+        <Text style={style.text}>{text}</Text>
       </View>
     </SafeAreaView>
   );

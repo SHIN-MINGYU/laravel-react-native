@@ -1,14 +1,14 @@
 import React from 'react';
 import {Button, SafeAreaView} from 'react-native';
 import request from '../../service/request';
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 const Test = () => {
-  const onPress = () => {
-    request
-      .get('/api/auth/check')
-      .then(res => console.log(res.data))
-      .catch(err => console.log(err));
+  const onPress = async () => {
+    const refreshToken = await EncryptedStorage.getItem('refreshToken');
+    await request.post('/api/request', {refreshToken});
   };
+
   return (
     <SafeAreaView>
       <Button onPress={onPress} title="hi" />

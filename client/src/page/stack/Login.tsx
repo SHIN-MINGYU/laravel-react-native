@@ -40,6 +40,9 @@ const Login = ({navigation}: props) => {
         email: email.value,
         password: password.value,
       })
+      .then(() => {
+        navigation.push('Test');
+      })
       .catch(err => console.log(err));
   };
 

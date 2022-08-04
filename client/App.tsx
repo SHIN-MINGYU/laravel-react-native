@@ -10,7 +10,6 @@
 
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-import {SafeAreaView, Text, View} from 'react-native';
 import MyStack from './src/navigation/StackNavigation';
 
 const App = () => {

@@ -41,8 +41,7 @@ class AuthController extends Controller
     }
 
     public function someRequest(Request $request){
-        return "hi";
-        return response()->json(['error'=>'Unauthorized'],401);
+        return $request->user();
     }
     public function createToken ($email, $password) {
         $credentials = array(

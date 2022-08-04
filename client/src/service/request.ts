@@ -20,7 +20,6 @@ request.interceptors.request.use(async config => {
 
 request.interceptors.response.use(
   async res => {
-    console.log('res data : ', res.data);
     if (res.data.access_token) {
       await EncryptedStorage.setItem('accessToken', res.data.access_token);
     }
@@ -34,32 +33,22 @@ request.interceptors.response.use(
     return res;
   },
   async error => {
-    const {
-      data: {error: errorMessage},
-      status,
-    } = error.response;
-    console.log('error');
-    if (errorMessage === 'Unauthorized' && status === 401) {
+    const {status} = error.response;
+    if (status === 405) {
       const refreshToken = await EncryptedStorage.getItem('refreshToken');
       const response = await axios.post(
-        'http://localhost:8000/api/restoreToken',
+        'http://10.0.2.2:8000/api/restoreToken',
         {refreshToken},
       );
       if (response.data.access_token) {
+        const originRequest = error.config;
         await EncryptedStorage.setItem(
           'accessToken',
           response.data.access_token,
         );
-        const res2 = await axios[error.config.method as 'get' | 'post' | 'put'](
-          error.config.url!,
-          error.config.data,
-          {
-            headers: {
-              Authorization: response.data.access_token,
-            },
-          },
-        );
-        console.log(res2.data);
+        originRequest.headers.Authorization =
+          'Bearer ' + response.data.access_token;
+        return axios(originRequest);
       }
     }
   },

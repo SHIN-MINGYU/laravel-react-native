@@ -18,4 +18,4 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login',[AuthController::class,'login'])->name('login');
 Route::post('/regist',[AuthController::class,'regist'])->name('regist');
 Route::post('/restoreToken',[AuthController::class,'restoreAccessToken'])->name('restoreToken');
-Route::post('/request',[AuthController::class,'someRequest'])->name('request');
+Route::middleware('auth:api')->post('/request',[AuthController::class,'someRequest'])->name('request');

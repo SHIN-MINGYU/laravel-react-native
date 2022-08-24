@@ -18,9 +18,10 @@ const Index = () => {
   const [currentPeriphreal, setPeripheral] = useState<any>(undefined); // 접속한 비콘에 대한 정보
   const handleDiscoverPeripheral = (peripheral: any) => {
     // 비콘 handleing event
+    console.log(peripheral.id);
     if (peripheral.id === MAC_ADDRESS) {
       setPeripheral(peripheral);
-      console.log(peripheral.advertising.serviceData);
+      console.log(peripheral);
     }
   };
   const initEvent = () => {
@@ -64,11 +65,20 @@ const Index = () => {
     }
   };
 
+  const connect = () => {
+    if (currentPeriphreal) {
+      BleManager.connect(currentPeriphreal.id).then(() => {});
+    }
+  };
+
+  // const connect = () => {
+  //   BleManager.connect
+  // }
   useEffect(() => {
     // component 가 mount 돨때 init 해줘야 할 것.
     initModule();
     initEvent();
-    // startSearch();
+    startSearch();
   }, []);
   return (
     <View
